@@ -10,12 +10,10 @@
 
 int main ()
 {
-    //int sockfd;
-    socklen_t len;
     struct sockaddr_in address;
+    int dlugosc;
 
     double num;
-    int dlugosc;
     printf("Podaj liczbe do spierwiastkowania \n");
     scanf("%lf", &num);
 
@@ -26,7 +24,7 @@ int main ()
     address.sin_family = AF_INET;
     address.sin_addr.s_addr = inet_addr ("127.0.0.1");
     address.sin_port = htons (9734);
-    len = sizeof (address);
+    socklen_t len = sizeof(address);
 
     /*  Now connect our socket to the server's socket.  */
     int result = connect (sockfd, (struct sockaddr *) &address, len);
@@ -40,11 +38,11 @@ int main ()
 
     /*  We can now read/write via sockfd.  */
     write (sockfd, &num, sizeof(double));
-	//write (sockfd, &godzina, 1);
     read (sockfd, &num, sizeof(double));
     read (sockfd, &dlugosc, sizeof(int));
-    //printf("dlugosc to: %d \n", dlugosc);
+    
     char godzina[dlugosc];
+    //char *godzina = (char *)malloc(dlugosc * sizeof(char));
 
     read (sockfd, &godzina, dlugosc);
 

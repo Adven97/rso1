@@ -10,7 +10,6 @@
 
 int main ()
 {
-    //int server_sockfd;
 	
     socklen_t server_len;
 	socklen_t client_len;
@@ -31,44 +30,45 @@ int main ()
 
     while (1)
     {
+        printf("server waiting\n");
+
+        /*  Accept connection.  */
+
+        client_len = sizeof(client_address);
+        client_sockfd = accept(server_sockfd,
+                               (struct sockaddr *)&client_address,
+                               &client_len);
+
+
         double num;
 
 		/* getting system time */
+
 		time_t rawtime;
   		struct tm * timeinfo;
   		time ( &rawtime );
   		timeinfo = localtime ( &rawtime );
-		char *godzina2 = asctime(timeinfo);
 
+        //time_t mytime = time(NULL);
+
+
+        char *godzina2 = asctime(timeinfo);
+        //godzina2[strlen(godzina2) - 1] = '\0';
         int dlugosc = strlen(godzina2);
-        //printf("dlugosc to: %d \n", dlugosc);
-
+        
         char godzina[dlugosc];
         strcpy(godzina,godzina2);
-        
-		//char g[10]="CYPIS";
-		//printf("dlugosc tego chara to: %d", strlen(godzina));
-		//char g[33]="poghjfjhfhfd";
-        printf ("server waiting\n");
-        printf ( "Current local time and date: %s", godzina );
+        godzina[dlugosc-1] ='\0';
 
-        /*  Accept connection.  */
-
-        client_len = sizeof (client_address);
-        client_sockfd = accept (server_sockfd,
-                (struct sockaddr *) &client_address,
-                &client_len);
 
         /*  We can now read/write to the client on client_sockfd.
             The five second delay is just for this demonstration.  */
 
         read (client_sockfd, &num, sizeof(double));
-        //read (client_sockfd, &godzina, 1);
         sleep (5);
-		//godzina = asctime (timeinfo);
-		//num=num*2.0;
-        double num22 = sqrt(num);
-		num = num22;
+
+        double num_temp = sqrt(num);
+		num = num_temp;
 		
         write (client_sockfd, &num, sizeof(double));
         write (client_sockfd, &dlugosc, sizeof(int));
