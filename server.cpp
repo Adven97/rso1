@@ -26,8 +26,8 @@ using namespace std;
 int main()
 {
     // create a socekt [int socket(int domain, int type, int protocol)];
-    int listenningSocket = socket(AF_INET, SOCK_STREAM, 0);
-    if (listenningSocket == -1)
+    int server_sock = socket(AF_INET, SOCK_STREAM, 0);
+    if (server_sock == -1)
     {
         cerr << "Can't create a socket!";
         return -1;
@@ -37,33 +37,33 @@ int main()
     server_address.sin_family = AF_INET;
     server_address.sin_port = htons(PORT);                   //htons converts the unsigned short integer hostshort from host byte order to network byte order.
     socklen_t server_size = sizeof(server_address);
-    inet_pton(AF_INET, "0.0.0.0", &server_address.sin_addr); //it's converts a number to an array of integers //0.0.0.0 will give us any existing ip address
+    inet_pton(AF_INET, "127.0.0.1", &server_address.sin_addr); //it's converts a number to an array of integers
 
-    int binded = bind(listenningSocket, (sockaddr *)&server_address, server_size);
+    int binded = bind(server_sock, (sockaddr *)&server_address, server_size);
     if (binded == -1)
     { 
         cerr << "Sorry, can't bind";
         return -2;
     }
 
-    int listened = listen(listenningSocket, SOMAXCONN); // mark the socket for listening in
+    int listened = listen(server_sock, SOMAXCONN); // mark the socket for listening in
     if (listened == -1)
     {
-        cerr << "Sorry, can't listen!";
+        cerr << "Sorry, can't listen";
         return -3;
     }
-    
+
     // accept 
     sockaddr_in client;
     socklen_t client_size = sizeof(client);
 
-    int clientSocket = accept(listenningSocket, (sockaddr *)&client, &client_size);
-    if (clientSocket == -1)
+    int client_soc = accept(server_sock, (sockaddr *)&client, &client_size);
+    if (client_soc == -1)
     {
         cerr << "Can't connect with client!";
         return -4;
     }
-    close(listenningSocket);
+    close(server_sock);
 
     cout << "Server is up and ready!" << endl;
 
@@ -74,8 +74,7 @@ int main()
         // clear the buffer
         memset(buffer, 0, BUFFER_SIZE);
         // wait for message
-        int bytesRecv = recv(clientSocket, buffer, BUFFER_SIZE, 0); // receives data from a connected socket or a bound connectionless socket.
-
+        int bytesRecv = recv(client_soc, buffer, BUFFER_SIZE, 0); // receives data from a connected socket or a bound connectionless socket.
         if (bytesRecv <= 0)
         {
             cerr << "Something went wrong" << endl;
@@ -95,23 +94,22 @@ int main()
         bool is_dot = false;
         bool correct = true;
 
-        double user_value = 0;
-        string messageToSend = date_time + " Sorry, unknown input";
+        double user_value;
+        string message_to_send = date_time + " Sorry, unknown input";    /// initial value to sends displays wrong input message
 
         /// check if user typed number and if big endian
-        for (int i = 0; i < bytesRecv - 1; i++)
-        {
-            if (buffer[i] >= 48 && buffer[i] <= 57)
-            {
+        for (int i = 0; i < bytesRecv - 1; i++){
+        
+            if (buffer[i] >= 48 && buffer[i] <= 57){
                 user_input += buffer[i];
             }
-            else if (buffer[i] == '.' && !is_dot)
-            {
+
+            else if (buffer[i] == '.' && !is_dot){
                 user_input += buffer[i];
                 is_dot=true;
             }
-            else
-            {
+
+            else{
                 correct = false;
                 break;
             }
@@ -123,18 +121,19 @@ int main()
             cout << "USER VALUE = " << user_value << endl;
 
             user_value = sqrt(user_value);
-            messageToSend = date_time + "  " + to_string(user_value);
+            message_to_send = date_time + "  " + to_string(user_value);
         }
 
+        int message_len = message_to_send.length();
         memset(buffer, 0, BUFFER_SIZE);
-        for (int j = 0; j < messageToSend.length(); j++)
-        {
-            buffer[j] = messageToSend[j];
+        for (int x = 0; x < message_len; x++){
+        
+            buffer[x] = message_to_send[x];
         }
         //send rsponse
-        send(clientSocket, buffer, messageToSend.length() + 1, 0);
+        send(client_soc, buffer, message_len + 1, 0);
     }
     // close socket
-    close(clientSocket);
+    close(client_soc);
     return 0;
 }
