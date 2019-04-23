@@ -35,10 +35,13 @@ int main(){
 
     char buffer[BUFFER_SIZE];
     string userInput;
+    string inp2;
     while (true){
 
-        cout << "Type number to make square root: ";
+        cout << "Type 0 to get date: "<<endl;
+        cout << "Type 1 to get square root: "<<endl;
         cin >> userInput;
+
         // send to server
         int response = send(clientSocket, userInput.c_str(), userInput.size() + 1, 0); // we are adding one because we want to have one special place for 0 that will mean end of user buffer
         if (response == -1){
@@ -49,7 +52,26 @@ int main(){
             cerr << "Server disconnected" << endl;
             break;
         }
-        
+
+        if (userInput == "1")
+        {
+            cout << "Give number to make square root: ";
+            cin >> inp2;
+
+            int response2 = send(clientSocket, inp2.c_str(), inp2.size() + 1, 0); // we are adding one because we want to have one special place for 0 that will mean end of user buffer
+            if (response2 == -1)
+            {
+                cerr << "Culdn't send message" << endl;
+                continue;
+            }
+            if (response2 == 0)
+            {
+                cerr << "Server disconnected" << endl;
+                break;
+            }
+            
+        }
+
         // clear the buffer
         memset(buffer, 0, BUFFER_SIZE);
         // wait for response

@@ -66,12 +66,14 @@ int main(){
 
     // while receving display echo message
     char buffer[BUFFER_SIZE];
+    char buffer2[BUFFER_SIZE];
     while (true)
     {
         // clear the buffer
         memset(buffer, 0, BUFFER_SIZE);
         // wait for message
         int bytesRecv = recv(client_soc, buffer, BUFFER_SIZE, 0); // receives data from a connected socket or a bound connectionless socket.
+        int bytesRecv2 = recv(client_soc, buffer2, BUFFER_SIZE, 0); // receives data from a connected socket or a bound connectionless socket.
         if (bytesRecv <= 0)
         {
             cerr << "Something went wrong" << endl;
@@ -92,33 +94,50 @@ int main(){
         bool correct = true;
 
         double user_value;
-        string message_to_send = date_time + " Sorry, unknown input";    /// initial value to sends displays wrong input message
+        string message_to_send = "Sorry, wrong input, try again";    /// initial value to sends displays wrong input message
 
         /// check if user typed number and if big endian
-        for (int i = 0; i < bytesRecv - 1; i++){
         
-            if (buffer[i] >= 48 && buffer[i] <= 57){
-                user_input += buffer[i];
+
+        if (buffer[0] == 48){
+            message_to_send = "DATA: " + date_time;
+        }
+        else if (buffer[0] == 49)
+        {
+            message_to_send =" Sorry, unknown input, can't make square root ";
+
+            for (int i = 0; i < bytesRecv2 - 1; i++)
+            {
+
+                if (buffer2[i] >= 48 && buffer2[i] <= 57)
+                {
+                    user_input += buffer2[i];
+                }
+
+                else if (buffer2[i] == '.' && !is_dot)
+                {
+                    user_input += buffer2[i];
+                    is_dot = true;
+                }
+
+                else
+                {
+                    correct = false;
+                    break;
+                }
             }
 
-            else if (buffer[i] == '.' && !is_dot){
-                user_input += buffer[i];
-                is_dot=true;
-            }
+            if (correct)
+            {
+                user_value = atof(user_input.c_str());
+                cout << "USER VALUE = " << user_value << endl;
 
-            else{
-                correct = false;
-                break;
+                user_value = sqrt(user_value);
+                message_to_send = "Number: "+to_string(user_value);
             }
         }
-
-        if(correct){
-        
-            user_value = atof(user_input.c_str());
-            cout << "USER VALUE = " << user_value << endl;
-
-            user_value = sqrt(user_value);
-            message_to_send = date_time + "  " + to_string(user_value);
+        else{
+            message_to_send = "Sorry, wrong input, try again";
         }
 
         int message_len = message_to_send.length();
