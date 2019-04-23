@@ -39,22 +39,23 @@ int main()
     socklen_t server_size = sizeof(server_address);
     inet_pton(AF_INET, "0.0.0.0", &server_address.sin_addr); //it's converts a number to an array of integers //0.0.0.0 will give us any existing ip address
 
-    if (bind(listenningSocket, (sockaddr *)&server_address, server_size) == -1)
+    int binded = bind(listenningSocket, (sockaddr *)&server_address, server_size);
+    if (binded == -1)
     { 
         cerr << "Sorry, can't bind";
         return -2;
     }
-    // mark the socket for listening in
-    if (listen(listenningSocket, SOMAXCONN) == -1)
+
+    int listened = listen(listenningSocket, SOMAXCONN); // mark the socket for listening in
+    if (listened == -1)
     {
         cerr << "Sorry, can't listen!";
         return -3;
     }
+    
     // accept 
     sockaddr_in client;
     socklen_t client_size = sizeof(client);
-    char host[NI_MAXHOST];
-    char svc[NI_MAXSERV];
 
     int clientSocket = accept(listenningSocket, (sockaddr *)&client, &client_size);
     if (clientSocket == -1)
@@ -62,10 +63,8 @@ int main()
         cerr << "Can't connect with client!";
         return -4;
     }
-    // close the listening socket
     close(listenningSocket);
-    memset(host, 0, NI_MAXHOST);
-    memset(svc, 0, NI_MAXSERV);
+
     cout << "Server is up and ready!" << endl;
 
     // while receving display echo message
