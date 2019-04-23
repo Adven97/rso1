@@ -66,7 +66,7 @@ int main(){
 
     // while receving display echo message
     char buffer[BUFFER_SIZE];
-    char buffer2[BUFFER_SIZE];
+    
     while (true)
     {
         // clear the buffer
@@ -94,22 +94,27 @@ int main(){
         bool correct = true;
 
         double user_value;
-        string message_to_send = "Sorry, wrong input, try again";    /// initial value to sends displays wrong input message
+        string message_to_send;    
 
         /// check if user typed number and if big endian
         
 
         if (buffer[0] == 48){
-            message_to_send = "DATA: " + date_time;
+            message_to_send = "Current date: " + date_time;
         }
         else if (buffer[0] == 49)
         {
+            message_to_send = " Sorry, unknown input, can't make square root "; /// initial value to sends displays wrong input message
+            char buffer2[BUFFER_SIZE];
             int bytesRecv2 = recv(client_soc, buffer2, BUFFER_SIZE, 0);
-            message_to_send =" Sorry, unknown input, can't make square root ";
+            if (bytesRecv2 <= 0)
+            {
+                cerr << "Something went wrong" << endl;
+                break;
+            }
 
             for (int i = 0; i < bytesRecv2 - 1; i++)
             {
-
                 if (buffer2[i] >= 48 && buffer2[i] <= 57)
                 {
                     user_input += buffer2[i];
@@ -134,7 +139,7 @@ int main(){
                 cout << "USER VALUE = " << user_value << endl;
 
                 user_value = sqrt(user_value);
-                message_to_send = "Number: "+to_string(user_value);
+                message_to_send = "Number extracted : "+to_string(user_value);
             }
         }
         else{
