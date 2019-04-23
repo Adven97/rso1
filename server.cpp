@@ -73,7 +73,7 @@ int main(){
         memset(buffer, 0, BUFFER_SIZE);
         // wait for message
         int bytesRecv = recv(client_soc, buffer, BUFFER_SIZE, 0); // receives data from a connected socket or a bound connectionless socket.
-        int bytesRecv2 = recv(client_soc, buffer2, BUFFER_SIZE, 0); // receives data from a connected socket or a bound connectionless socket.
+         // receives data from a connected socket or a bound connectionless socket.
         if (bytesRecv <= 0)
         {
             cerr << "Something went wrong" << endl;
@@ -104,6 +104,7 @@ int main(){
         }
         else if (buffer[0] == 49)
         {
+            int bytesRecv2 = recv(client_soc, buffer2, BUFFER_SIZE, 0);
             message_to_send =" Sorry, unknown input, can't make square root ";
 
             for (int i = 0; i < bytesRecv2 - 1; i++)
