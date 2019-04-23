@@ -41,16 +41,15 @@ int main(){
         cin >> userInput;
         // send to server
         int response = send(clientSocket, userInput.c_str(), userInput.size() + 1, 0); // we are adding one because we want to have one special place for 0 that will mean end of user buffer
-        if (response == -1)
-        {
+        if (response == -1){
             cerr << "Culdn't send message" << endl;
             continue;
         }
-        if (response == 0)
-        {
+        if (response == 0){
             cerr << "Server disconnected" << endl;
             break;
         }
+        
         // clear the buffer
         memset(buffer, 0, BUFFER_SIZE);
         // wait for response

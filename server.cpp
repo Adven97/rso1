@@ -23,8 +23,8 @@
 // SOMAXCONN - max number of connections
 using namespace std;
 
-int main()
-{
+int main(){
+
     // create a socekt [int socket(int domain, int type, int protocol)];
     int server_sock = socket(AF_INET, SOCK_STREAM, 0);
     if (server_sock == -1)
@@ -40,15 +40,13 @@ int main()
     inet_pton(AF_INET, "127.0.0.1", &server_address.sin_addr); //it's converts a number to an array of integers
 
     int binded = bind(server_sock, (sockaddr *)&server_address, server_size);
-    if (binded == -1)
-    { 
+    if (binded == -1){
         cerr << "Sorry, can't bind";
         return -2;
     }
 
     int listened = listen(server_sock, SOMAXCONN); // mark the socket for listening in
-    if (listened == -1)
-    {
+    if (listened == -1){
         cerr << "Sorry, can't listen";
         return -3;
     }
@@ -58,8 +56,7 @@ int main()
     socklen_t client_size = sizeof(client);
 
     int client_soc = accept(server_sock, (sockaddr *)&client, &client_size);
-    if (client_soc == -1)
-    {
+    if (client_soc == -1){
         cerr << "Can't connect with client!";
         return -4;
     }
