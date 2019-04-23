@@ -66,7 +66,7 @@ int main(){
 
     // while receving display echo message
     char buffer[BUFFER_SIZE];
-    
+    char buffer2[BUFFER_SIZE];
     while (true)
     {
         // clear the buffer
@@ -86,26 +86,16 @@ int main(){
         stringstream s;
         s << put_time(localtime(&in_time_t), "%Y-%m-%d %X");
         string date_time= s.str();
-
-
-        // check if number
-        string user_input = "";
-        bool is_dot = false;
-        bool correct = true;
-
-        double user_value;
+        
         string message_to_send;    
 
-        /// check if user typed number and if big endian
-        
-
-        if (buffer[0] == 48){
+        if (buffer[0] == '0'){
             message_to_send = "Current date: " + date_time;
         }
-        else if (buffer[0] == 49)
+        else if (buffer[0] == '1')
         {
             message_to_send = " Sorry, unknown input, can't make square root "; /// initial value to sends displays wrong input message
-            char buffer2[BUFFER_SIZE];
+
             int bytesRecv2 = recv(client_soc, buffer2, BUFFER_SIZE, 0);
             if (bytesRecv2 <= 0)
             {
@@ -113,6 +103,12 @@ int main(){
                 break;
             }
 
+            double user_value;
+            string user_input = "";
+            bool is_dot = false;
+            bool correct = true;
+            
+            //check if number in correct order
             for (int i = 0; i < bytesRecv2 - 1; i++)
             {
                 if (buffer2[i] >= 48 && buffer2[i] <= 57)
