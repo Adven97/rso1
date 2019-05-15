@@ -23,6 +23,21 @@
 // SOMAXCONN - max number of connections
 using namespace std;
 
+double checkifBigEndian(double value)
+{
+    char *b = (char *)&value;
+    if (b[0])
+    {
+        cout << "LITTLE ENDIAN " << endl;
+        value = htonl(value);
+    }
+    else
+    {
+        cout << "BIG ENDIAN " << endl;
+    }
+    return value;
+}
+
 int main(){
 
     // create a socekt [int socket(int domain, int type, int protocol)];
@@ -46,6 +61,8 @@ int main(){
     }
 
     int listened = listen(server_sock, SOMAXCONN); // mark the socket for listening in
+    
+
     if (listened == -1){
         cerr << "Sorry, can't listen";
         return -3;
@@ -61,7 +78,6 @@ int main(){
         return -4;
     }
     close(server_sock);
-
     cout << "Server is up and ready!" << endl;
 
     // while receving display echo message
@@ -73,7 +89,7 @@ int main(){
         memset(buffer, 0, BUFFER_SIZE);
         // wait for message
         int bytesRecv = recv(client_soc, buffer, BUFFER_SIZE, 0); // receives data from a connected socket or a bound connectionless socket.
-         // receives data from a connected socket or a bound connectionless socket.
+
         if (bytesRecv <= 0)
         {
             cerr << "Something went wrong" << endl;
@@ -89,12 +105,13 @@ int main(){
         
         string message_to_send;    
 
-        if (buffer[0] == '0'){
+        if (buffer[0] == '0')
+        {
             message_to_send = "Current date: " + date_time;
         }
         else if (buffer[0] == '1')
         {
-            message_to_send = " Sorry, unknown input, can't make square root "; /// initial value to sends displays wrong input message
+            message_to_send = " Sorry, unknown input, can't make square root "; /// initial value to send displays wrong input message
 
             int bytesRecv2 = recv(client_soc, buffer2, BUFFER_SIZE, 0);
             if (bytesRecv2 <= 0)
@@ -107,7 +124,7 @@ int main(){
             string user_input = "";
             bool is_dot = false;
             bool correct = true;
-            
+
             //check if number in correct order
             for (int i = 0; i < bytesRecv2 - 1; i++)
             {
@@ -132,20 +149,24 @@ int main(){
             if (correct)
             {
                 user_value = atof(user_input.c_str());
+                user_value = checkifBigEndian(user_value);
+                //user_value = ntohl(user_value);
                 cout << "USER VALUE = " << user_value << endl;
 
                 user_value = sqrt(user_value);
                 message_to_send = "Number extracted : "+to_string(user_value);
             }
         }
-        else{
+        else
+        {
             message_to_send = "Sorry, wrong input, try again";
         }
 
         int message_len = message_to_send.length();
+
         memset(buffer, 0, BUFFER_SIZE);
-        for (int x = 0; x < message_len; x++){
-        
+        for (int x = 0; x < message_len; x++)
+        {
             buffer[x] = message_to_send[x];
         }
         //send rsponse
@@ -155,3 +176,23 @@ int main(){
     close(client_soc);
     return 0;
 }
+
+double reverseValue(const char *data)
+{
+    double result;
+
+    char *dest = (char *)&result;
+
+    for (int i = 0; i < sizeof(double); i++)
+    {
+        dest[i] = data[sizeof(double) - i - 1];
+    }
+    return result;
+}
+
+int32_t swap_int32(int32_t val)
+{
+    val = ((val << 8) & 0xFF00FF00) | ((val >> 8) & 0xFF00FF);
+    return (val << 16) | ((val >> 16) & 0xFFFF);
+}
+
